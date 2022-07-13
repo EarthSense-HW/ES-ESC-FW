@@ -1,5 +1,6 @@
 # ES-ESC-FW
-Firmware for the EarthSense ESC Based on VESC4
+Firmware for the EarthSense ESC Based on VESC4, edited from Benjamin Vedder's VESC firmware located here:
+[https://github.com/vedderb/bldc](https://github.com/vedderb/bldc)
 
 ## Modifications from VESC Firmware
 * Added support for AS5048B I2C encoder
