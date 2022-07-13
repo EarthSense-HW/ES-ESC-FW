@@ -11,6 +11,7 @@ Firmware for the EarthSense ESC Based on VESC4, edited from Benjamin Vedder's VE
 * Clone this repository
 * Import this repo folder into ChibiStudio
   * File > New > Makefile Project with existing code
+  * Borwse for the ES-ESC-FW folder, and deselect C++ if it's selected (firmware is C only)
 * Press Build Button at top and ensure you get a build success message once it finishes.
 
 ## How to Flash
