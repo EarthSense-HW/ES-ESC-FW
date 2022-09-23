@@ -32,6 +32,4 @@ void terminal_register_command_callback(
 		void(*cbf)(int argc, const char **argv));
 void terminal_unregister_callback(void(*cbf)(int argc, const char **argv));
 
-bool get_stream_debug(void);
-
 #endif /* TERMINAL_H_ */

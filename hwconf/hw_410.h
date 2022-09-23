@@ -19,6 +19,8 @@
 #define HW_410_H_
 
 #define HW_NAME					"410"
+#define HW_MAJOR                4
+#define HW_MINOR                10
 
 // Macros
 #define ENABLE_GATE()			palSetPad(GPIOC, 10)
@@ -125,12 +127,12 @@
 #define HW_ICU_PIN				5
 
 // I2C Peripheral
-#define HW_I2C_DEV				I2C2
+#define HW_I2C_DEV				I2CD2
 #define HW_I2C_GPIO_AF			GPIO_AF_I2C2
 #define HW_I2C_SCL_PORT			GPIOB
-#define HW_I2C_SCL_PIN			6
+#define HW_I2C_SCL_PIN			10
 #define HW_I2C_SDA_PORT			GPIOB
-#define HW_I2C_SDA_PIN			7
+#define HW_I2C_SDA_PIN			11
 
 // Hall/encoder pins
 #define HW_HALL_ENC_GPIO1		GPIOB
