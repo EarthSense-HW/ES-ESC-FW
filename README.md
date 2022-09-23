@@ -13,71 +13,6 @@ An open source motor controller firmware.
 This is the source code for the VESC DC/BLDC/FOC controller. Read more at
 [https://vesc-project.com/](https://vesc-project.com/)
 
-## Supported boards
-
-All  of them!
-
-Make sure you select your board in [conf_general.h](conf_general.h)
-
-
-```c
-//#define HW_SOURCE "hw_40.c"
-//#define HW_HEADER "hw_40.h"
-
-//#define HW_SOURCE "hw_45.c"
-//#define HW_HEADER "hw_45.h"
-
-//#define HW_SOURCE "hw_46.c" // Also for 4.7
-//#define HW_HEADER "hw_46.h" // Also for 4.7
-
-//#define HW_SOURCE "hw_48.c"
-//#define HW_HEADER "hw_48.h"
-
-//#define HW_SOURCE "hw_49.c"
-//#define HW_HEADER "hw_49.h"
-
-//#define HW_SOURCE "hw_410.c" // Also for 4.11 and 4.12
-//#define HW_HEADER "hw_410.h" // Also for 4.11 and 4.12
-
-#define HW_SOURCE "hw_60.c"
-#define HW_HEADER "hw_60.h"
-
-//#define HW_SOURCE "hw_r2.c"
-//#define HW_HEADER "hw_r2.h"
-
-//#define HW_SOURCE "hw_victor_r1a.c"
-//#define HW_HEADER "hw_victor_r1a.h"
-
-//#define HW_SOURCE "hw_das_rs.c"
-//#define HW_HEADER "hw_das_rs.h"
-
-//#define HW_SOURCE "hw_axiom.c"
-//#define HW_HEADER "hw_axiom.h"
-
-//#define HW_SOURCE "hw_rh.c"
-//#define HW_HEADER "hw_rh.h"
-
-//#define HW_SOURCE "hw_tp.c"
-//#define HW_HEADER "hw_tp.h"
-
-//#define HW_SOURCE "hw_75_300.c"
-//#define HW_HEADER "hw_75_300.h"
-
-//#define HW_SOURCE "hw_mini4.c"
-//#define HW_HEADER "hw_mini4.h"
-
-//#define HW_SOURCE "hw_das_mini.c"
-//#define HW_HEADER "hw_das_mini.h"
-
-//#define HW_SOURCE "hw_uavc_qcube.c"
-//#define HW_HEADER "hw_uavc_qcube.h"
-
-//#define HW_SOURCE "hw_uavc_basic.c"
-//#define HW_HEADER "hw_uavc_basic.h"
-```
-There are also many other options that can be changed in conf_general.h
-
-
 ## Prerequisites
 
 ### On Ubuntu
@@ -111,25 +46,6 @@ sudo mv 49-stlinkv2.rules /etc/udev/rules.d/
 sudo udevadm trigger
 ```
 
-### On MacOS
-
-Go to the [GNU ARM embedded toolchain downloads Website](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads) and select the mac version, download it and extract it to your user directory.
-
-Append the bin directory to your **$PATH**. For example:
-
-
-```bash
-export PATH="$PATH:/Users/your-name/gcc-arm-none-eabi-8-2019-q3-update/bin/"
-```
-
-Install stlink and openocd
-
-
-```bash
-brew install stlink
-brew install openocd
-```
-
 ## Build
 Clone and build the firmware
 
@@ -138,53 +54,3 @@ git clone https://github.com/vedderb/bldc.git vesc_firmware
 cd vesc_firmware
 make
 ```
-
-
-## Upload to VESC
-### Method 1 - Flash it using an STLink SWD debugger
-
-Build and flash the [bootloader](https://github.com/vedderb/bldc-bootloader) first
-
-```bash
-make upload
-```
-### Method 2 - Upload Firmware via VESC tool through USB
-
-1. Clone and build the firmware in **.bin** format
-
-Reminder : Remember to select your board in [**conf_general.h**]
-
-```bash
-git clone https://github.com/vedderb/bldc.git vesc_firmware
-cd vesc_firmware
-#make build/your_firmware_name_here.bin
-make build/VESC_fw.bin 
-```
-In VESC tool
-
-2. Connect to the VESC
-3. Navigate to the Firmware tab on the left side menu 
-4. Click on Custom file tab
-5. Click on the folder icon to select the built firmware in .bin format (e.g. VESC_fw.bin)  
-
-##### [ Reminder : It is normal to see VESC disconnects during the firmware upload process ]  
-#####  **[ Warning : DO NOT DISCONNECT POWER/USB to VESC during the upload process, or you will risk bricking your VESC ]**  
-#####  **[ Warning : ONLY DISCONNECT your VESC 10s after the upload loading bar completed and "FW Upload DONE" ]**
-
-6. Press the upload firmware button (downward arrow) on the bottom right to start upload the selected firmware.
-7. Wait for **10s** after the loading bar completed (Warning: unplug sooner will risk bricking your VESC)
-8. The VESC will disconnect itself after new firmware is uploaded.
-
-## In case you bricked your VESC
-you will need to upload a new working firmware to the VESC.  
-However, to upload a firmware to a bricked VESC, you have to use a SWD Debugger.
-
-
-## Contribute
-
-Head to the [forums](https://vesc-project.com/forum) to get involved and improve this project.
-
-
-## License
-
-The software is released under the GNU General Public License version 3.0
