@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "canard.h": "c",
+        "hw.h": "c",
+        "conf_general.h": "c",
+        "cmparams.h": "c",
+        "hal.h": "c",
+        "ledpwm.h": "c",
+        "stm32f4xx_conf.h": "c",
+        "stm32f407xx.h": "c"
+    }
+}

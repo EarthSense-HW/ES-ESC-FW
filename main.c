@@ -48,6 +48,7 @@
 #include "timer.h"
 #include "imu.h"
 #include "flash_helper.h"
+#include "estop.h"
 #if HAS_BLACKMAGIC
 #include "bm_if.h"
 #endif
@@ -298,6 +299,10 @@ int main(void) {
 
 #ifdef HW_SHUTDOWN_HOLD_ON
 	shutdown_init();
+#endif
+
+#if ESTOP_ENABLE
+	estop_init();
 #endif
 
 	imu_reset_orientation();

@@ -273,6 +273,13 @@
 #endif
 
 /*
+ * Enable ESTOP
+ */
+#ifndef ESTOP_ENABLE
+#define ESTOP_ENABLE                1
+#endif
+
+/*
  * Settings for the external LEDs (hardcoded for now)
  */
 #define LED_EXT_BATT_LOW			28.0

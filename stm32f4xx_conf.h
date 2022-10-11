@@ -4,6 +4,7 @@
 #define USE_RTOS	0
 
 #include "misc.h"
+#include "stm32f407xx.h"
 #include "stm32f4_gpio_af.h"
 #include "stm32f4xx_dma.h"
 #include "stm32f4xx_adc.h"

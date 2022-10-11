@@ -85,6 +85,12 @@ void hw_init_gpio(void) {
 	// Fault pin
 	palSetPadMode(GPIOC, 12, PAL_MODE_INPUT_PULLUP);
 
+	// ESTOP pin
+	palSetPadMode(GPIOC, 8, PAL_MODE_OUTPUT_PUSHPULL | 
+			PAL_STM32_PUDR_PULLDOWN);
+	palWritePad(GPIOC, 8, PAL_LOW);
+	palSetPadMode(GPIOC, 9, PAL_MODE_INPUT);
+
 	// ADC Pins
 	palSetPadMode(GPIOA, 0, PAL_MODE_INPUT_ANALOG);
 	palSetPadMode(GPIOA, 1, PAL_MODE_INPUT_ANALOG);
