@@ -20,43 +20,6 @@
 #include "estop.h"
 
 #if ESTOP_ENABLE
-// Threads
-thread_reference_t estop_trp = NULL;
-static THD_WORKING_AREA(estop_thread_wa, 256);
-
-CH_IRQ_HANDLER(EXTI9_5_IRQHandler) {
-	// Wakes up ESTOP thread
-	if (EXTI_GetITStatus(EXTI_Line9) != RESET) {
-		// Resume thread
-		chSysLockFromISR();
-		chThdResumeI(&estop_trp, (msg_t)0x1337);
-		chSysUnlockFromISR();
-
-		// Clear the ESTOP pending bit
-		EXTI_ClearITPendingBit(EXTI_Line9);
-	}
-}
-
-static THD_FUNCTION(estop_thread, arg) {
-    (void)arg;
-    chRegSetThreadName("ESTOP Triggered");
-
-    for (;;) {
-        // TEST CODE: Blink LED
-        while(palReadPad(GPIOC, 9) == PAL_HIGH) {
-            ledpwm_set_intensity(LED_RED, 0.5);
-            chThdSleepMilliseconds(100);
-            LED_RED_ON();
-            chThdSleepMilliseconds(75);
-            LED_RED_OFF();
-        }
-
-        chSysLock();
-        chThdSuspendS(&estop_trp);
-        chSysUnlock();
-    }
-}
-
 void estop_init(void) {
     // Set ESTOP EXTI interrupt to highest priority
     // Connect EXTI Line to pin
@@ -70,10 +33,5 @@ void estop_init(void) {
 	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructure);
     nvicEnableVector(EXTI9_5_IRQn, 0);
-
-    chThdCreateStatic(estop_thread_wa, sizeof(estop_thread_wa), ABSPRIO - 1, estop_thread, NULL);
-
-    estop_init_done = true;
 }
-
 #endif

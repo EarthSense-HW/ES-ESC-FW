@@ -24,11 +24,7 @@
 #include "hal.h"
 #include "conf_general.h"
 #include "ledpwm.h"
-
-#if ESTOP_ENABLE
-// Variables
-static volatile bool estop_init_done = false;
-#endif
+#include "mc_interface.h"
 
 void estop_init(void);
 
