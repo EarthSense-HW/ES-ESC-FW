@@ -75,13 +75,14 @@ CH_IRQ_HANDLER(PVD_IRQHandler) {
 }
 
 CH_IRQ_HANDLER(EXTI9_5_IRQHandler) {
-	// Sends fault to stop motors
+	CH_IRQ_PROLOGUE();
 	if (EXTI_GetITStatus(EXTI_Line9) != RESET) {
-		// Send fault
+		// Log the fault. ESTOP triggered, motors must halt.
 		mc_interface_fault_stop(FAULT_CODE_ESTOP, false, true);
-
+	
 		// Clear the ESTOP pending bit
 		EXTI_ClearITPendingBit(EXTI_Line9);
 		EXTI_ClearFlag(EXTI_Line9);
 	}
+	CH_IRQ_EPILOGUE();
 }

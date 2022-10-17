@@ -2605,6 +2605,13 @@ static void update_stats(volatile motor_if_state_t *motor) {
 	if (fabsf(val.current_tot) > motor->m_stats.max_current) {
 		motor->m_stats.max_current = fabsf(val.current_tot);
 	}
+	
+	if (motor->m_fault_now == FAULT_CODE_ESTOP) {
+		mc_interface_ignore_input(500);
+		if (palReadPad(GPIOC, 9) == PAL_LOW) {
+			motor->m_fault_now = FAULT_CODE_NONE;
+		}
+	}
 }
 
 float mc_interface_stat_speed_avg(void) {
@@ -2679,8 +2686,7 @@ static THD_FUNCTION(stat_thread, arg) {
 #ifdef HW_HAS_DUAL_MOTORS
 		update_stats(&m_motor_2);
 #endif
-
-		chThdSleepMilliseconds(10);
+		//chThdSleepMilliseconds(10);
 	}
 }
 
