@@ -22,8 +22,6 @@
 
 #include "hal.h"
 #include "conf_general.h"
-#include "ledpwm.h"
-#include "mc_interface.h"
 
 void estop_init(void);
 

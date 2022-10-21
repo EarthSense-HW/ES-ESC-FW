@@ -2686,7 +2686,7 @@ static THD_FUNCTION(stat_thread, arg) {
 #ifdef HW_HAS_DUAL_MOTORS
 		update_stats(&m_motor_2);
 #endif
-		//chThdSleepMilliseconds(10);
+		chThdSleepMilliseconds(10);
 	}
 }
 
