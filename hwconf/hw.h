@@ -420,8 +420,17 @@
 
 // Default ID
 #ifndef HW_DEFAULT_ID
-#define HW_DEFAULT_ID			(APPCONF_CONTROLLER_ID >= 0 ? APPCONF_CONTROLLER_ID : hw_id_from_uuid())
+#define HW_DEFAULT_ID			(APPCONF_CONTROLLER_ID >= 0 ? APPCONF_CONTROLLER_ID : hw_id_from_pins())
 #endif
+
+#ifndef HW_ID_PIN_GPIOS
+#define HW_ID_PIN_GPIOS         GPIOB, GPIOB
+#endif
+
+#ifndef HW_ID_PIN_PINS
+#define HW_ID_PIN_PINS          4, 3
+#endif
+
 
 #ifndef HW_LIM_CURRENT
 #define HW_LIM_CURRENT			-100.0, 100.0

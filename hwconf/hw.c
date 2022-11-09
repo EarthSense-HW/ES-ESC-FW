@@ -43,8 +43,8 @@ uint8_t hw_id_from_pins(void) {
 
 	const uint16_t DELAY_MS = 5;
 	uint8_t trits[hw_id_pins_size];
-	uint8_t id = 1u; //Start at 1
-	for (uint8_t i=0; i<hw_id_pins_size; i++) {
+	uint8_t id = 0u; //Start at 0
+	for (uint8_t i=0; i < hw_id_pins_size; i++) {
 		//Initialize pulldown
 		palSetPadMode(hw_id_ports[i], hw_id_pins[i], PAL_MODE_INPUT_PULLDOWN);
 		
@@ -59,19 +59,19 @@ uint8_t hw_id_from_pins(void) {
 		//Now determine the trit state
 		if (!pin_set_pulldown && !pin_set_pullup) {
 			//Tied to GND
-			trits[i] = 1u;
+			trits[i] = 0u;
 		} else if (pin_set_pulldown && pin_set_pullup) {
 			//Tied to VCC
-			trits[i] = 2u;
+			trits[i] = 1u;
 		} else if (!pin_set_pulldown && pin_set_pullup) {
 			//Floating
-			trits[i] = 0u;
+			trits[i] = 2u;
 		} else {
 			return hw_id_from_uuid();
 			//To satisfy compiler warning
 			trits[i] = 3u;
 		}
-		id += trits[i] * pow(3, i); 
+		id += trits[i] * pow(2, i); // Calculate ID : Both 
 		palSetPadMode(hw_id_ports[i], hw_id_pins[i], PAL_MODE_INPUT);
 	}
 	return id;
