@@ -431,6 +431,26 @@
 #define HW_ID_PIN_PINS          4, 3
 #endif
 
+// Position Map
+#ifndef POS_INVALID_ID
+#define POS_INVALID_ID          99
+#endif
+
+#ifndef POS_0_VESC_ID 
+#define POS_0_VESC_ID            2
+#endif
+
+#ifndef POS_1_VESC_ID 
+#define POS_1_VESC_ID            0
+#endif
+
+#ifndef POS_2_VESC_ID 
+#define POS_2_VESC_ID            1
+#endif
+
+#ifndef POS_3_VESC_ID 
+#define POS_3_VESC_ID            3
+#endif
 
 #ifndef HW_LIM_CURRENT
 #define HW_LIM_CURRENT			-100.0, 100.0

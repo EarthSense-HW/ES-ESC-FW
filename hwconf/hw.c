@@ -43,7 +43,8 @@ uint8_t hw_id_from_pins(void) {
 
 	const uint16_t DELAY_MS = 5;
 	uint8_t trits[hw_id_pins_size];
-	uint8_t id = 0u; //Start at 0
+	uint8_t position = 0u; //Start at position 0
+	uint8_t id = 0u; //Return VESC_ID
 	for (uint8_t i=0; i < hw_id_pins_size; i++) {
 		//Initialize pulldown
 		palSetPadMode(hw_id_ports[i], hw_id_pins[i], PAL_MODE_INPUT_PULLDOWN);
@@ -71,8 +72,42 @@ uint8_t hw_id_from_pins(void) {
 			//To satisfy compiler warning
 			trits[i] = 3u;
 		}
-		id += trits[i] * pow(2, i); // Calculate ID : Both 
+		position += trits[i] * pow(2, i); // Calculate ID : Both 
 		palSetPadMode(hw_id_ports[i], hw_id_pins[i], PAL_MODE_INPUT);
+	}
+
+	/* Position Map for Earthsense 2020 System Board V1.2
+	 * Position     VESC_ID
+	 * 	  0	           2
+	 *    1            0      
+	 *    2            1
+	 *    3            3
+	 * 
+	 * Diagram:
+	 * -------------------------	      -----------------\
+	 * |   POS_2   |   POS_3   |__________|			GPM		|
+	 * \   VESC_1  |   VESC_3                 GPS           |
+	 *  | ---------|---------   MOS     IMU             PI  |
+	 * /	POS_1  |   POS_0    __________                  |
+	 * |   VESC_0  |   VESC_2  |	      |   VRM           | 
+	 * -------------------------          -----------------/
+	*/
+	switch (position) {
+	case 0:
+		id = POS_0_VESC_ID;
+		break;
+	case 1:
+		id = POS_1_VESC_ID;
+		break;
+	case 2:
+		id = POS_2_VESC_ID;
+		break;
+	case 3:
+		id = POS_3_VESC_ID;
+		break;
+	default:
+		id = POS_INVALID_ID;
+		break;
 	}
 	return id;
 }
