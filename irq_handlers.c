@@ -27,6 +27,8 @@
 #include "encoder.h"
 #include "estop.h"
 
+long lastPressed = 0;
+
 CH_IRQ_HANDLER(ADC1_2_3_IRQHandler) {
 	CH_IRQ_PROLOGUE();
 	ADC_ClearITPendingBit(ADC1, ADC_IT_JEOC);
@@ -72,17 +74,4 @@ CH_IRQ_HANDLER(PVD_IRQHandler) {
 		EXTI_ClearITPendingBit(EXTI_Line16);
 		EXTI_ClearFlag(EXTI_Line16);
 	}
-}
-
-CH_IRQ_HANDLER(EXTI9_5_IRQHandler) {
-	CH_IRQ_PROLOGUE();
-	if (EXTI_GetITStatus(EXTI_Line9) != RESET) {
-		// Log the fault. ESTOP triggered, motors must halt.
-		mc_interface_fault_stop(FAULT_CODE_ESTOP, false, true);
-	
-		// Clear the ESTOP pending bit
-		EXTI_ClearITPendingBit(EXTI_Line9);
-		EXTI_ClearFlag(EXTI_Line9);
-	}
-	CH_IRQ_EPILOGUE();
 }

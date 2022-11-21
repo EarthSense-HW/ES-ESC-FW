@@ -540,6 +540,10 @@ mc_fault_code mc_interface_get_fault(void) {
 	return motor_now()->m_fault_now;
 }
 
+void mc_interface_set_fault(mc_fault_code fault) {
+	motor_now()->m_fault_now = fault;
+}
+
 const char* mc_interface_fault_to_string(mc_fault_code fault) {
 	switch (fault) {
 	case FAULT_CODE_NONE: return "FAULT_CODE_NONE"; break;
@@ -2604,13 +2608,6 @@ static void update_stats(volatile motor_if_state_t *motor) {
 
 	if (fabsf(val.current_tot) > motor->m_stats.max_current) {
 		motor->m_stats.max_current = fabsf(val.current_tot);
-	}
-	
-	if (motor->m_fault_now == FAULT_CODE_ESTOP) {
-		mc_interface_ignore_input(500);
-		if (palReadPad(GPIOC, 9) == PAL_LOW) {
-			motor->m_fault_now = FAULT_CODE_NONE;
-		}
 	}
 }
 

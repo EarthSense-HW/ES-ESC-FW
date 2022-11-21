@@ -22,6 +22,11 @@
 
 #include "hal.h"
 #include "conf_general.h"
+#include "mc_interface.h"
+
+#define ESTOP_INPUT_PORT            GPIOC
+#define ESTOP_INPUT_PAD             9
+#define ESTOP_DEBOUNCE_DELAY        50L
 
 void estop_init(void);
 
