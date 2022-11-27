@@ -1396,6 +1396,18 @@ static void decode_msg(uint32_t eid, uint8_t *data8, int len, bool is_replaced) 
 			timeout_reset();
 			break;
 
+		case CAN_PACKET_SET_FAULT: ;
+			// Fault Code is in 2nd Byte
+			// BUG::Processing multiple times with different data8
+			mc_fault_code fault_code = data8[1];
+			if (fault_code == FAULT_CODE_ESTOP) {
+				mc_interface_fault_stop(FAULT_CODE_ESTOP, FALSE, FALSE);
+			}
+			else {
+				mc_interface_set_fault(fault_code);
+			}
+			break;
+
 		case CAN_PACKET_FILL_RX_BUFFER:
 			memcpy(rx_buffer + data8[0], data8 + 1, len - 1);
 			break;

@@ -20,13 +20,17 @@
 #ifndef ESTOP_H
 #define ESTOP_H
 
+#include "app.h"
 #include "hal.h"
+#include "comm_can.h"
 #include "conf_general.h"
 #include "mc_interface.h"
 
 #define ESTOP_INPUT_PORT            GPIOC
 #define ESTOP_INPUT_PAD             9
 #define ESTOP_DEBOUNCE_DELAY        50L
+// Hash Out This Functionality (Master if ID == 0)
+//#define IS_MASTER                   (== 0)
 
 void estop_init(void);
 

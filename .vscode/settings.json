@@ -7,6 +7,7 @@
         "hal.h": "c",
         "ledpwm.h": "c",
         "stm32f4xx_conf.h": "c",
-        "stm32f407xx.h": "c"
+        "stm32f407xx.h": "c",
+        "mc_interface.h": "c"
     }
 }

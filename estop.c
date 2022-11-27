@@ -39,6 +39,12 @@ static THD_FUNCTION(estop_thread, arg) {
             // Outcome: Trigger ESTOP fault
             if (estop_button_state == PAL_HIGH && estop_fault_state == FALSE) {
                 mc_interface_fault_stop(FAULT_CODE_ESTOP, FALSE, FALSE);
+                // Send over CAN as Broadcast (ID = 255)
+                uint8_t buffer[2];
+	            buffer[0] = app_get_configuration()->controller_id;
+                buffer[1] = FAULT_CODE_ESTOP;
+	            comm_can_transmit_eid_replace(255 | ((uint32_t)CAN_PACKET_SET_FAULT << 8), buffer, 2, true);
+
                 estop_fault_state = TRUE;
                 last_pressed = chVTGetSystemTime();
             }
@@ -46,6 +52,12 @@ static THD_FUNCTION(estop_thread, arg) {
             // Outcome: Remove ESTOP fault and set to FAULT_CODE_NONE
             else if (estop_button_state == PAL_LOW && estop_fault_state == TRUE) {
                 mc_interface_set_fault(FAULT_CODE_NONE);
+                // Send over CAN as Broadcast (ID = 255)
+                uint8_t buffer[2];
+	            buffer[0] = app_get_configuration()->controller_id;
+                buffer[1] = FAULT_CODE_NONE;
+	            comm_can_transmit_eid_replace(255 | ((uint32_t)CAN_PACKET_SET_FAULT << 8), buffer, 2, true);
+
                 estop_fault_state = FALSE;
                 last_pressed = chVTGetSystemTime();
             }
