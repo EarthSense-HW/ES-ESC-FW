@@ -1398,7 +1398,6 @@ static void decode_msg(uint32_t eid, uint8_t *data8, int len, bool is_replaced) 
 
 		case CAN_PACKET_SET_FAULT: ;
 			// Fault Code is in 2nd Byte
-			// BUG::Processing multiple times with different data8
 			mc_fault_code fault_code = data8[1];
 			if (fault_code == FAULT_CODE_ESTOP) {
 				mc_interface_fault_stop(FAULT_CODE_ESTOP, FALSE, FALSE);
