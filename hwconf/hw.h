@@ -420,7 +420,36 @@
 
 // Default ID
 #ifndef HW_DEFAULT_ID
-#define HW_DEFAULT_ID			(APPCONF_CONTROLLER_ID >= 0 ? APPCONF_CONTROLLER_ID : hw_id_from_uuid())
+#define HW_DEFAULT_ID			(APPCONF_CONTROLLER_ID >= 0 ? APPCONF_CONTROLLER_ID : hw_id_from_pins())
+#endif
+
+#ifndef HW_ID_PIN_GPIOS
+#define HW_ID_PIN_GPIOS         GPIOB, GPIOB
+#endif
+
+#ifndef HW_ID_PIN_PINS
+#define HW_ID_PIN_PINS          4, 3
+#endif
+
+// Position Map
+#ifndef POS_INVALID_ID
+#define POS_INVALID_ID          99
+#endif
+
+#ifndef POS_0_VESC_ID 
+#define POS_0_VESC_ID            2
+#endif
+
+#ifndef POS_1_VESC_ID 
+#define POS_1_VESC_ID            0
+#endif
+
+#ifndef POS_2_VESC_ID 
+#define POS_2_VESC_ID            1
+#endif
+
+#ifndef POS_3_VESC_ID 
+#define POS_3_VESC_ID            3
 #endif
 
 #ifndef HW_LIM_CURRENT

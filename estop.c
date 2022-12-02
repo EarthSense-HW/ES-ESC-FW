@@ -42,7 +42,7 @@ static THD_FUNCTION(estop_thread, arg) {
                 // Send over CAN as Broadcast (ID = 255)
                 uint8_t buffer[2];
 	            buffer[0] = app_get_configuration()->controller_id;
-                buffer[1] = FAULT_CODE_ESTOP;
+                buffer[1] = (uint8_t)FAULT_CODE_ESTOP;
 	            comm_can_transmit_eid_replace(255 | ((uint32_t)CAN_PACKET_SET_FAULT << 8), buffer, 2, true);
 
                 estop_fault_state = TRUE;
@@ -55,7 +55,7 @@ static THD_FUNCTION(estop_thread, arg) {
                 // Send over CAN as Broadcast (ID = 255)
                 uint8_t buffer[2];
 	            buffer[0] = app_get_configuration()->controller_id;
-                buffer[1] = FAULT_CODE_NONE;
+                buffer[1] = (uint8_t)FAULT_CODE_NONE;
 	            comm_can_transmit_eid_replace(255 | ((uint32_t)CAN_PACKET_SET_FAULT << 8), buffer, 2, true);
 
                 estop_fault_state = FALSE;
@@ -73,7 +73,8 @@ static THD_FUNCTION(estop_thread, arg) {
 }
 
 void estop_init(void) {
-    // Create Estop Thread
-    chThdCreateStatic(estop_thread_wa, sizeof(estop_thread_wa), NORMALPRIO, estop_thread, NULL);
+    // Create Estop Thread Only for Master ESC
+    if (hw_id_from_pins() == MASTER_ID)
+        chThdCreateStatic(estop_thread_wa, sizeof(estop_thread_wa), NORMALPRIO, estop_thread, NULL);
 }
 #endif

@@ -27,10 +27,9 @@
 #include "mc_interface.h"
 
 #define ESTOP_INPUT_PORT            GPIOC
-#define ESTOP_INPUT_PAD             9
+#define ESTOP_INPUT_PAD             9U
 #define ESTOP_DEBOUNCE_DELAY        50L
-// Hash Out This Functionality (Master if ID == 0)
-//#define IS_MASTER                   (== 0)
+#define MASTER_ID                   0U
 
 void estop_init(void);
 
