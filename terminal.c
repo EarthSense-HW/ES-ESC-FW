@@ -1270,6 +1270,64 @@ void terminal_process_string(char *str) {
 		commands_printf("update_pid_pos_offset [angle_now] [store]");
 		commands_printf("  Update position PID offset.");
 
+		// Custom EarthSense Commands in Help Page
+		// RL Tuning
+		commands_printf("earthsense_detect_and_apply_r_l");
+		commands_printf("  Measure and apply motor resistance and inductance.");
+
+		commands_printf("earthsense_detect_and_apply_r_l_can");
+		commands_printf("  Measure and apply motor resistance and inductance.");
+		commands_printf("  Fowards command to all VESCs.");
+
+		// Flux Linkage Tuning
+		commands_printf("earthsense_detect_and_apply_foc_linkage");
+		commands_printf("  Measure and apply motor flux linkage.");
+
+		commands_printf("earthsense_detect_and_apply_foc_linkage_can");
+		commands_printf("  Measure and apply motor flux linkage.");
+		commands_printf("  Fowards command to all VESCs.");
+
+		// Hall Sensor Tuning
+		commands_printf("earthsense_detect_and_apply_hall_sensors");
+		commands_printf("  Measure and apply hall sensor measurements.");
+
+		commands_printf("earthsense_detect_and_apply_hall_sensors_can");
+		commands_printf("  Measure and apply hall sensor measurements.");
+		commands_printf("  Fowards command to all VESCs.");
+
+		// Automatic Tuning
+		commands_printf("earthsense_detect_and_apply_foc_all");
+		commands_printf("  Measure and apply all tuning requirements for EarthSense VESCs.");
+
+		commands_printf("earthsense_detect_and_apply_foc_all_can");
+		commands_printf("  Measure and apply all tuning requirements for EarthSense VESCs.");
+		commands_printf("  Fowards command to all VESCs.");
+
+		// Motor Tuning Paramters
+		// Current KP
+		commands_printf("earthsense_set_current_KP");
+		commands_printf("  Set motor current KP parameter.");
+
+		commands_printf("earthsense_set_current_KP_can");
+		commands_printf("  Set motor current KP parameter.");
+		commands_printf("  Fowards command to all VESCs.");
+
+		// Current KI
+		commands_printf("earthsense_set_current_KI");
+		commands_printf("  Set motor current KI parameter.");
+
+		commands_printf("earthsense_set_current_KI_can");
+		commands_printf("  Set motor current KI parameter.");
+		commands_printf("  Fowards command to all VESCs.");
+
+		// Obersever Gain
+		commands_printf("earthsense_set_observer_gain");
+		commands_printf("  Set motor oberserver gain parameter.");
+
+		commands_printf("earthsense_set_observer_gain_can");
+		commands_printf("  Set motor oberserver gain parameter.");
+		commands_printf("  Fowards command to all VESCs.");
+
 		for (int i = 0;i < callback_write;i++) {
 			if (callbacks[i].cbf == 0) {
 				continue;
@@ -1289,6 +1347,37 @@ void terminal_process_string(char *str) {
 		}
 
 		commands_printf(" ");
+	} 
+	// Custom EarthSense Commands
+	else if (strcmp(argv[0], "earthsense_detect_and_apply_r_l") == 0) {
+		//commands_process_packet
+		
+	} else if (strcmp(argv[0], "earthsense_detect_and_apply_r_l_can") == 0) {
+
+	} else if (strcmp(argv[0], "earthsense_detect_and_apply_foc_linkage") == 0) {
+
+	} else if (strcmp(argv[0], "earthsense_detect_and_apply_foc_linkage_can") == 0) {
+
+	} else if (strcmp(argv[0], "earthsense_detect_and_apply_hall_sensors") == 0) {
+
+	} else if (strcmp(argv[0], "earthsense_detect_and_apply_hall_sensors_can") == 0) {
+
+	} else if (strcmp(argv[0], "earthsense_detect_and_apply_foc_all") == 0) {
+
+	} else if (strcmp(argv[0], "earthsense_detect_and_apply_foc_all_can") == 0) {
+
+	} else if (strcmp(argv[0], "earthsense_set_current_KP") == 0) {
+
+	} else if (strcmp(argv[0], "earthsense_set_current_KP_can") == 0) {
+
+	} else if (strcmp(argv[0], "earthsense_set_current_KI") == 0) {
+
+	} else if (strcmp(argv[0], "earthsense_set_current_KI_can") == 0) {
+
+	} else if (strcmp(argv[0], "earthsense_set_observer_gain") == 0) {
+
+	} else if (strcmp(argv[0], "earthsense_set_observer_gain_can") == 0) {
+
 	} else {
 		commands_printf("Invalid command: %s\n"
 				"type help to list all available commands\n", argv[0]);
