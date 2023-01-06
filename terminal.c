@@ -1348,10 +1348,31 @@ void terminal_process_string(char *str) {
 
 		commands_printf(" ");
 	} 
-	// Custom EarthSense Commands
+	// Custom EarthSense Commands *(Note: Called from blocking_tp: Blocking Thread)*
 	else if (strcmp(argv[0], "earthsense_detect_and_apply_r_l") == 0) {
-		//commands_process_packet
-		
+		mc_configuration *mcconf = mempools_alloc_mcconf();
+		*mcconf = *mc_interface_get_configuration();
+
+		mcconf->motor_type = MOTOR_TYPE_FOC;
+
+		float r = 0.0;
+		float l = 0.0;
+		float ld_lq_diff = 0.0;
+		bool res = mcpwm_foc_measure_res_ind(&r, &l, &ld_lq_diff);
+
+		// Test Successful: Save Motor Configuration
+		if (res) {
+			commands_printf("Resistance: %lf   Inductance: %lf   ld_lq_diff: %lf", r, l, ld_lq_diff);
+			mcconf->foc_motor_r = r;
+			mcconf->foc_motor_l = l/1e6;
+			mcconf->foc_motor_ld_lq_diff = ld_lq_diff/1e6;
+			mc_interface_set_configuration(mcconf);
+		} 
+		else {
+			commands_printf("Resistance and Inductance Tuning Failed!");
+		}
+
+		mempools_free_mcconf(mcconf);
 	} else if (strcmp(argv[0], "earthsense_detect_and_apply_r_l_can") == 0) {
 
 	} else if (strcmp(argv[0], "earthsense_detect_and_apply_foc_linkage") == 0) {
