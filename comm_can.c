@@ -38,6 +38,7 @@
 #include "mempools.h"
 #include "shutdown.h"
 #include "bms.h"
+#include "terminal.h"
 
 // Settings
 #define RX_FRAMES_SIZE	100
@@ -1396,7 +1397,7 @@ static void decode_msg(uint32_t eid, uint8_t *data8, int len, bool is_replaced) 
 			timeout_reset();
 			break;
 
-		case CAN_PACKET_SET_FAULT: ;
+		case CAN_PACKET_SET_FAULT: {
 			// Fault Code is in 2nd Byte
 			mc_fault_code fault_code = data8[1];
 			if (fault_code == FAULT_CODE_ESTOP) {
@@ -1405,7 +1406,7 @@ static void decode_msg(uint32_t eid, uint8_t *data8, int len, bool is_replaced) 
 			else {
 				mc_interface_set_fault(fault_code);
 			}
-			break;
+		} break;		
 
 		case CAN_PACKET_FILL_RX_BUFFER:
 			memcpy(rx_buffer + data8[0], data8 + 1, len - 1);
@@ -1576,6 +1577,52 @@ static void decode_msg(uint32_t eid, uint8_t *data8, int len, bool is_replaced) 
 
 				detect_all_foc_res[detect_all_foc_res_index++] = (int8_t)data8[0];
 				detect_all_foc_res_index %= sizeof(detect_all_foc_res);
+			} break;
+
+			// EarthSense Tuning Commands
+			case CAN_PACKET_ES_DETECT_APPLY_ALL_R_L: {
+				earthsense_detect_and_apply_r_l();
+			} break;
+
+			case CAN_PACKET_ES_DETECT_APPLY_ALL_LINKAGE: {
+				// Process CAN Packet: [ID, CURRENT, MIN_RPM, DUTY]
+				// Current, Min_rpm, Duty in 2nd, 3rd, 4th bytes respectively
+				float current = data8[1];
+				float min_rpm = data8[2];
+				float duty = data8[3];
+				earthsense_detect_and_apply_foc_linkage(current, min_rpm, duty);
+			} break;
+
+			case CAN_PACKET_ES_DETECT_APPLY_ALL_HALL: {
+				// Process CAN Packet: [ID, CURRENT]
+				// Current in 2nd byte 
+				float current = data8[1];
+				earthsense_detect_and_apply_hall_sensors(current);
+			} break;
+
+			case CAN_PACKET_ES_DETECT_APPLY_ALL_FOC_TUNING: {
+				earthsense_detect_and_apply_foc_all();
+			} break;
+
+			case CAN_PACKET_ES_SET_CURRENT_KP: {
+				// Process CAN Packet: [ID, CURRENT_KP]
+				// Current_kp in 2nd byte 
+				float current_kp = data8[1];
+				earthsense_set_current_kp(current_kp);
+			} break;
+			
+			case CAN_PACKET_ES_SET_CURRENT_KI: {
+				// Process CAN Packet: [ID, CURRENT_KI]
+				// Current in 2nd byte 
+				float current_ki = data8[1];
+				earthsense_set_current_ki(current_ki);
+			} break;
+
+			case CAN_PACKET_ES_SET_OBSERVER_GAIN: {
+				// Process CAN Packet: [ID, OBSERVER_GAIN]
+				// Current in 2nd byte 
+				float observer_gain = data8[1];
+				earthsense_set_observer_gain(observer_gain);
 			} break;
 
 			case CAN_PACKET_CONF_CURRENT_LIMITS:
