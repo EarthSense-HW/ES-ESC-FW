@@ -1601,28 +1601,42 @@ static void decode_msg(uint32_t eid, uint8_t *data8, int len, bool is_replaced) 
 			} break;
 
 			case CAN_PACKET_ES_DETECT_APPLY_ALL_FOC_TUNING: {
-				earthsense_detect_and_apply_foc_all();
+				// Process CAN Packet: [ID, CURRENT, MIN_RPM, DUTY]
+				// Current, Min_rpm, Duty in 2nd, 3rd, 4th bytes respectively
+				float current = data8[1];
+				float min_rpm = data8[2];
+				float duty = data8[3];
+				earthsense_detect_and_apply_foc_all(current, min_rpm, duty);
 			} break;
 
 			case CAN_PACKET_ES_SET_CURRENT_KP: {
 				// Process CAN Packet: [ID, CURRENT_KP]
-				// Current_kp in 2nd byte 
+				// Current_KP in 2nd byte 
 				float current_kp = data8[1];
 				earthsense_set_current_kp(current_kp);
 			} break;
 			
 			case CAN_PACKET_ES_SET_CURRENT_KI: {
 				// Process CAN Packet: [ID, CURRENT_KI]
-				// Current in 2nd byte 
+				// Current_KI in 2nd byte 
 				float current_ki = data8[1];
 				earthsense_set_current_ki(current_ki);
 			} break;
 
 			case CAN_PACKET_ES_SET_OBSERVER_GAIN: {
 				// Process CAN Packet: [ID, OBSERVER_GAIN]
-				// Current in 2nd byte 
+				// Observer Gain in 2nd byte 
 				float observer_gain = data8[1];
 				earthsense_set_observer_gain(observer_gain);
+			} break;
+
+			case CAN_PACKET_ES_ALL_MOTOR_PARAMETERS: {
+				// Process CAN Packet: [ID, CURRENT_KP, CURRENT_KI, OBSERVER_GAIN]
+				// Current_KP, Current_KI, Observer_Gain in 2nd 3rd 4th byte 
+				float current_kp = data8[1];
+				float current_ki = data8[2];
+				float observer_gain = data8[3];
+				earthsense_set_all_motor_parameters(current_kp, current_ki, observer_gain);
 			} break;
 
 			case CAN_PACKET_CONF_CURRENT_LIMITS:

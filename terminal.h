@@ -36,9 +36,10 @@ void terminal_unregister_callback(void(*cbf)(int argc, const char **argv));
 void earthsense_detect_and_apply_r_l(void);
 void earthsense_detect_and_apply_foc_linkage(float current_, float min_rpm_, float duty_);
 void earthsense_detect_and_apply_hall_sensors(float current_);
-void earthsense_detect_and_apply_foc_all(void);
+void earthsense_detect_and_apply_foc_all(float current_, float min_rpm_, float duty_);
 void earthsense_set_current_kp(float current_kp_);
 void earthsense_set_current_ki(float current_ki_);
 void earthsense_set_observer_gain(float observer_gain_);
+void earthsense_set_all_motor_parameters(float current_kp_, float current_ki_, float observer_gain_);
 
 #endif /* TERMINAL_H_ */

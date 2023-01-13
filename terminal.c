@@ -95,7 +95,7 @@ void earthsense_detect_and_apply_foc_linkage(float current_, float min_rpm_, flo
 	float min_rpm = min_rpm_;
 	float duty = duty_;
 	float resistance = mcconf->foc_motor_r;
-	float inductance = mcconf->foc_motor_l;
+	float inductance = 0.0;
 
 	float linkage, linkage_undriven, undriven_samples;
 	bool res = conf_general_measure_flux_linkage_openloop(current, duty, min_rpm, resistance, inductance,
@@ -109,7 +109,7 @@ void earthsense_detect_and_apply_foc_linkage(float current_, float min_rpm_, flo
 	if (res)
 	{
 		commands_printf("Linkage: %lf", linkage);
-		mcconf->foc_motor_flux_linkage = linkage / 1e6;
+		mcconf->foc_motor_flux_linkage = linkage;
 		mc_interface_set_configuration(mcconf);
 	}
 	else
@@ -133,7 +133,7 @@ void earthsense_detect_and_apply_hall_sensors(float current_)
 		mcconf->foc_current_ki = 10.0;
 		mc_interface_set_configuration(mcconf);
 
-		int8_t hall_tab[8];
+		uint8_t hall_tab[8];
 		bool res = mcpwm_foc_hall_detect(current_, hall_tab);
 
 		// Test Successful: Save Motor Configuration
@@ -142,7 +142,7 @@ void earthsense_detect_and_apply_hall_sensors(float current_)
 			int hall_table_length = 8;
 			for (int i = 0; i < hall_table_length; i++) {
 				commands_printf("Hall Table #%d: %d", i, hall_tab[i]);				
-				mcconf->hall_table[i] = hall_tab[i];
+				mcconf->hall_table[i] = (int8_t)hall_tab[i];
 			}
 			mc_interface_set_configuration(mcconf);
 		}
@@ -158,8 +158,14 @@ void earthsense_detect_and_apply_hall_sensors(float current_)
 	mempools_free_mcconf(mcconf);
 }
 
-void earthsense_detect_and_apply_foc_all(void)
+void earthsense_detect_and_apply_foc_all(float current_, float min_rpm_, float duty_)
 {
+	// Run RL Tuning 
+	earthsense_detect_and_apply_r_l();
+	// Run Linakge Tuning
+	earthsense_detect_and_apply_foc_linkage(current_, min_rpm_, duty_);
+	// Run Hall Sensors Tuning
+	earthsense_detect_and_apply_hall_sensors(current_);
 }
 
 void earthsense_set_current_kp(float current_kp_)
@@ -187,6 +193,18 @@ void earthsense_set_observer_gain(float observer_gain_)
 	mc_configuration *mcconf = mempools_alloc_mcconf();
 	*mcconf = *mc_interface_get_configuration();
 
+	mcconf->foc_observer_gain = observer_gain_ * 1e6;
+	mc_interface_set_configuration(mcconf);
+	mempools_free_mcconf(mcconf);
+}
+
+
+void earthsense_set_all_motor_parameters(float current_kp_, float current_ki_, float observer_gain_) {
+	mc_configuration *mcconf = mempools_alloc_mcconf();
+	*mcconf = *mc_interface_get_configuration();
+
+	mcconf->foc_current_kp = current_kp_;
+	mcconf->foc_current_ki = current_ki_;
 	mcconf->foc_observer_gain = observer_gain_ * 1e6;
 	mc_interface_set_configuration(mcconf);
 	mempools_free_mcconf(mcconf);
@@ -1750,10 +1768,10 @@ void terminal_process_string(char *str)
 		commands_printf("  Fowards command to all VESCs.");
 
 		// Automatic Tuning
-		commands_printf("earthsense_detect_and_apply_foc_all");
+		commands_printf("earthsense_detect_and_apply_foc_all [current] [min_rpm] [duty]");
 		commands_printf("  Measure and apply all tuning requirements for EarthSense VESCs.");
 
-		commands_printf("earthsense_detect_and_apply_foc_all_can");
+		commands_printf("earthsense_detect_and_apply_foc_all_can [current] [min_rpm] [duty]");
 		commands_printf("  Measure and apply all tuning requirements for EarthSense VESCs.");
 		commands_printf("  Fowards command to all VESCs.");
 
@@ -1780,6 +1798,14 @@ void terminal_process_string(char *str)
 
 		commands_printf("earthsense_set_observer_gain_can [observer_gain]");
 		commands_printf("  Set motor oberserver gain parameter.");
+		commands_printf("  Fowards command to all VESCs.");
+
+		// All Paramters
+		commands_printf("earthsense_set_all_motor_parameters [current_kp] [current_ki] [observer_gain]");
+		commands_printf("  Set motor current KP , current KI, and Observer Gain.");
+
+		commands_printf("earthsense_set_all_motor_parameters_can [current_kp] [current_ki] [observer_gain]");
+		commands_printf("  Set motor current KP , current KI, and Observer Gain.");
 		commands_printf("  Fowards command to all VESCs.");
 
 		for (int i = 0; i < callback_write; i++)
@@ -1871,9 +1897,29 @@ void terminal_process_string(char *str)
 	}
 	else if (strcmp(argv[0], "earthsense_detect_and_apply_foc_all") == 0)
 	{
+		// Get Input from Terminal
+		float current = -1, min_rpm = -1, duty = -1;
+		sscanf(argv[1], "%f", &current);
+		sscanf(argv[2], "%f", &min_rpm);
+		sscanf(argv[3], "%f", &duty);
+		earthsense_detect_and_apply_foc_all(current, min_rpm, duty);
 	}
 	else if (strcmp(argv[0], "earthsense_detect_and_apply_foc_all_can") == 0)
 	{
+		// Get Input from Terminal
+		float current = -1, min_rpm = -1, duty = -1;
+		sscanf(argv[1], "%f", &current);
+		sscanf(argv[2], "%f", &min_rpm);
+		sscanf(argv[3], "%f", &duty);
+
+		// Send CAN Packet as Broadcast (ID = 255) [ID, CURRENT, MIN_RPM, DUTY]
+		int length = 4;
+		uint8_t buffer[length];
+		buffer[0] = app_get_configuration()->controller_id;
+		buffer[1] = current;
+		buffer[2] = min_rpm;
+		buffer[3] = duty;
+		comm_can_transmit_eid_replace(255 | ((uint32_t)CAN_PACKET_ES_DETECT_APPLY_ALL_FOC_TUNING << 8), buffer, length, true);
 	}
 	else if (strcmp(argv[0], "earthsense_set_current_kp") == 0)
 	{
@@ -1937,6 +1983,33 @@ void terminal_process_string(char *str)
 		buffer[0] = app_get_configuration()->controller_id;
 		buffer[1] = observer_gain;
 		comm_can_transmit_eid_replace(255 | ((uint32_t)CAN_PACKET_ES_SET_OBSERVER_GAIN << 8), buffer, length, true);
+	}
+	else if (strcmp(argv[0], "earthsense_set_all_motor_parameters") == 0)
+	{
+		// Get Input from Terminal
+		float current_kp = -1, current_ki = -1, observer_gain = -1;
+		sscanf(argv[1], "%f", &current_kp);
+		sscanf(argv[2], "%f", &current_ki);
+		sscanf(argv[3], "%f", &observer_gain);
+
+		earthsense_set_all_motor_parameters(current_kp, current_ki, observer_gain);
+	}
+	else if (strcmp(argv[0], "earthsense_set_all_motor_parameters_can") == 0)
+	{
+		// Get Input from Terminal
+		float current_kp = -1, current_ki = -1, observer_gain = -1;
+		sscanf(argv[1], "%f", &current_kp);
+		sscanf(argv[2], "%f", &current_ki);
+		sscanf(argv[3], "%f", &observer_gain);
+
+		// Send CAN Packet as Broadcast (ID = 255) [ID, CURRENT_KP, CURRENT_KI, OBSERVER_GAIN]
+		int length = 4;
+		uint8_t buffer[length];
+		buffer[0] = app_get_configuration()->controller_id;
+		buffer[1] = current_kp;
+		buffer[2] =	current_ki;
+		buffer[3] = observer_gain;
+		comm_can_transmit_eid_replace(255 | ((uint32_t)CAN_PACKET_ES_ALL_MOTOR_PARAMETERS << 8), buffer, length, true);
 	}
 	else
 	{
