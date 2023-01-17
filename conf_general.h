@@ -276,7 +276,7 @@
  * Enable ESTOP
  */
 #ifndef ESTOP_ENABLE
-#define ESTOP_ENABLE                1
+#define ESTOP_ENABLE                0
 #endif
 
 /*

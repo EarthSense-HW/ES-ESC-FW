@@ -1867,13 +1867,13 @@ void terminal_process_string(char *str)
 		sscanf(argv[2], "%f", &min_rpm);
 		sscanf(argv[3], "%f", &duty);
 
-		// Send CAN Packet as Broadcast (ID = 255) [ID, CURRENT, MIN_RPM, DUTY]
+		// Send CAN Packet as Broadcast (ID = 255) [ID, CURRENT, MIN_RPM / 10, DUTY * 10]
 		int length = 4;
 		uint8_t buffer[length];
 		buffer[0] = app_get_configuration()->controller_id;
 		buffer[1] = current;
-		buffer[2] = min_rpm;
-		buffer[3] = duty;
+		buffer[2] = min_rpm / 10;
+		buffer[3] = duty * 10;
 		comm_can_transmit_eid_replace(255 | ((uint32_t)CAN_PACKET_ES_DETECT_APPLY_ALL_LINKAGE << 8), buffer, length, true);
 	}
 	else if (strcmp(argv[0], "earthsense_detect_and_apply_hall_sensors") == 0)
@@ -1915,13 +1915,13 @@ void terminal_process_string(char *str)
 		sscanf(argv[3], "%f", &duty);
 		sscanf(argv[4], "%f", &hall_current);
 
-		// Send CAN Packet as Broadcast (ID = 255) [ID, CURRENT, MIN_RPM, DUTY, HALL_CURRENT]
+		// Send CAN Packet as Broadcast (ID = 255) [ID, CURRENT, MIN_RPM / 10, DUTY * 10, HALL_CURRENT]
 		int length = 5;
 		uint8_t buffer[length];
 		buffer[0] = app_get_configuration()->controller_id;
 		buffer[1] = current;
-		buffer[2] = min_rpm;
-		buffer[3] = duty;
+		buffer[2] = min_rpm / 10;
+		buffer[3] = duty * 10;
 		buffer[4] = hall_current;
 		comm_can_transmit_eid_replace(255 | ((uint32_t)CAN_PACKET_ES_DETECT_APPLY_ALL_FOC_TUNING << 8), buffer, length, true);
 	}
@@ -1939,11 +1939,11 @@ void terminal_process_string(char *str)
 		float current_kp = -1;
 		sscanf(argv[1], "%f", &current_kp);
 
-		// Send CAN Packet as Broadcast (ID = 255) [ID, CURRENT_KP]
+		// Send CAN Packet as Broadcast (ID = 255) [ID, CURRENT_KP * 100]
 		int length = 2;
 		uint8_t buffer[length];
 		buffer[0] = app_get_configuration()->controller_id;
-		buffer[1] = current_kp;
+		buffer[1] = current_kp * 100;
 		comm_can_transmit_eid_replace(255 | ((uint32_t)CAN_PACKET_ES_SET_CURRENT_KP << 8), buffer, length, true);
 	}
 	else if (strcmp(argv[0], "earthsense_set_current_ki") == 0)
@@ -1960,11 +1960,11 @@ void terminal_process_string(char *str)
 		float current_ki = -1;
 		sscanf(argv[1], "%f", &current_ki);
 
-		// Send CAN Packet as Broadcast (ID = 255) [ID, CURRENT_KI]
+		// Send CAN Packet as Broadcast (ID = 255) [ID, CURRENT_KI * 10]
 		int length = 2;
 		uint8_t buffer[length];
 		buffer[0] = app_get_configuration()->controller_id;
-		buffer[1] = current_ki;
+		buffer[1] = current_ki * 10;
 		comm_can_transmit_eid_replace(255 | ((uint32_t)CAN_PACKET_ES_SET_CURRENT_KI << 8), buffer, length, true);
 	}
 	else if (strcmp(argv[0], "earthsense_set_observer_gain") == 0)
@@ -1981,11 +1981,11 @@ void terminal_process_string(char *str)
 		float observer_gain = -1;
 		sscanf(argv[1], "%f", &observer_gain);
 
-		// Send CAN Packet as Broadcast (ID = 255) [ID, OBSERVER_GAIN]
+		// Send CAN Packet as Broadcast (ID = 255) [ID, OBSERVER_GAIN * 100]
 		int length = 2;
 		uint8_t buffer[length];
 		buffer[0] = app_get_configuration()->controller_id;
-		buffer[1] = observer_gain;
+		buffer[1] = observer_gain * 100;
 		comm_can_transmit_eid_replace(255 | ((uint32_t)CAN_PACKET_ES_SET_OBSERVER_GAIN << 8), buffer, length, true);
 	}
 	else if (strcmp(argv[0], "earthsense_set_all_motor_parameters") == 0)
@@ -2006,13 +2006,13 @@ void terminal_process_string(char *str)
 		sscanf(argv[2], "%f", &current_ki);
 		sscanf(argv[3], "%f", &observer_gain);
 
-		// Send CAN Packet as Broadcast (ID = 255) [ID, CURRENT_KP, CURRENT_KI, OBSERVER_GAIN]
+		// Send CAN Packet as Broadcast (ID = 255) [ID, CURRENT_KP * 100, CURRENT_KI * 10, OBSERVER_GAIN * 100]
 		int length = 4;
 		uint8_t buffer[length];
 		buffer[0] = app_get_configuration()->controller_id;
-		buffer[1] = current_kp;
-		buffer[2] =	current_ki;
-		buffer[3] = observer_gain;
+		buffer[1] = current_kp * 100;
+		buffer[2] =	current_ki * 10;
+		buffer[3] = observer_gain * 100;
 		comm_can_transmit_eid_replace(255 | ((uint32_t)CAN_PACKET_ES_ALL_MOTOR_PARAMETERS << 8), buffer, length, true);
 	}
 	else

@@ -27,6 +27,20 @@ bool estop_fault_state = FALSE;
 
 static THD_WORKING_AREA(estop_thread_wa, 256);
 static THD_FUNCTION(estop_thread, arg) {
+    (void)arg;
+
+    while(1) {
+        // Check ESTOP_FAULT to stop motors input
+        if (mc_interface_get_fault() == FAULT_CODE_ESTOP) {
+            mc_interface_ignore_input(150);
+        }
+
+        chThdSleepMilliseconds(10);
+    }
+}
+
+static THD_WORKING_AREA(estop_master_thread_wa, 256);
+static THD_FUNCTION(estop_master_thread, arg) {
 	(void)arg;
 
     while(1) {
@@ -63,11 +77,6 @@ static THD_FUNCTION(estop_thread, arg) {
             }
         }
 
-        // Check ESTOP_FAULT to stop motors input
-        if (mc_interface_get_fault() == FAULT_CODE_ESTOP) {
-            mc_interface_ignore_input(150);
-        }
-
         chThdSleepMilliseconds(10);
     }
 }
@@ -75,6 +84,9 @@ static THD_FUNCTION(estop_thread, arg) {
 void estop_init(void) {
     // Create Estop Thread Only for Master ESC
     if (hw_id_from_pins() == MASTER_ID)
-        chThdCreateStatic(estop_thread_wa, sizeof(estop_thread_wa), NORMALPRIO, estop_thread, NULL);
+        chThdCreateStatic(estop_master_thread_wa, sizeof(estop_master_thread_wa), NORMALPRIO, estop_master_thread, NULL);
+    
+    // Create Estop Thread to Enforce Blocking Motor Commands
+    chThdCreateStatic(estop_thread_wa, sizeof(estop_thread_wa), NORMALPRIO, estop_thread, NULL);
 }
 #endif

@@ -1585,11 +1585,12 @@ static void decode_msg(uint32_t eid, uint8_t *data8, int len, bool is_replaced) 
 			} break;
 
 			case CAN_PACKET_ES_DETECT_APPLY_ALL_LINKAGE: {
-				// Process CAN Packet: [ID, CURRENT, MIN_RPM, DUTY]
+				// Process CAN Packet: [ID, CURRENT, MIN_RPM / 10, DUTY * 10]
 				// Current, Min_rpm, Duty in 2nd, 3rd, 4th bytes respectively
 				float current = data8[1];
-				float min_rpm = data8[2];
+				float min_rpm = data8[2] * 10;
 				float duty = data8[3];
+				duty = duty / 10;
 				earthsense_detect_and_apply_foc_linkage(current, min_rpm, duty);
 			} break;
 
@@ -1601,33 +1602,37 @@ static void decode_msg(uint32_t eid, uint8_t *data8, int len, bool is_replaced) 
 			} break;
 
 			case CAN_PACKET_ES_DETECT_APPLY_ALL_FOC_TUNING: {
-				// Process CAN Packet: [ID, CURRENT, MIN_RPM, DUTY, HALL_CURRENT]
+				// Process CAN Packet: [ID, CURRENT, MIN_RPM / 10, DUTY * 10, HALL_CURRENT]
 				// Current, Min_rpm, Duty in 2nd, 3rd, 4th bytes respectively
 				float current = data8[1];
-				float min_rpm = data8[2];
+				float min_rpm = data8[2] * 10;
 				float duty = data8[3];
+				duty = duty / 10;
 				float hall_current = data8[4];
 				earthsense_detect_and_apply_foc_all(current, min_rpm, duty, hall_current);
 			} break;
 
 			case CAN_PACKET_ES_SET_CURRENT_KP: {
-				// Process CAN Packet: [ID, CURRENT_KP]
+				// Process CAN Packet: [ID, CURRENT_KP * 100]
 				// Current_KP in 2nd byte 
 				float current_kp = data8[1];
+				current_kp = current_kp / 100;
 				earthsense_set_current_kp(current_kp);
 			} break;
 			
 			case CAN_PACKET_ES_SET_CURRENT_KI: {
-				// Process CAN Packet: [ID, CURRENT_KI]
+				// Process CAN Packet: [ID, CURRENT_KI * 10]
 				// Current_KI in 2nd byte 
 				float current_ki = data8[1];
+				current_ki = current_ki / 10;
 				earthsense_set_current_ki(current_ki);
 			} break;
 
 			case CAN_PACKET_ES_SET_OBSERVER_GAIN: {
-				// Process CAN Packet: [ID, OBSERVER_GAIN]
+				// Process CAN Packet: [ID, OBSERVER_GAIN * 100]
 				// Observer Gain in 2nd byte 
 				float observer_gain = data8[1];
+				observer_gain = observer_gain / 100;
 				earthsense_set_observer_gain(observer_gain);
 			} break;
 
@@ -1635,8 +1640,11 @@ static void decode_msg(uint32_t eid, uint8_t *data8, int len, bool is_replaced) 
 				// Process CAN Packet: [ID, CURRENT_KP, CURRENT_KI, OBSERVER_GAIN]
 				// Current_KP, Current_KI, Observer_Gain in 2nd 3rd 4th byte 
 				float current_kp = data8[1];
+				current_kp = current_kp / 100;
 				float current_ki = data8[2];
+				current_ki = current_ki / 10;
 				float observer_gain = data8[3];
+				observer_gain = observer_gain / 100;
 				earthsense_set_all_motor_parameters(current_kp, current_ki, observer_gain);
 			} break;
 
