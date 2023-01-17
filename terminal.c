@@ -91,14 +91,11 @@ void earthsense_detect_and_apply_foc_linkage(float current_, float min_rpm_, flo
 	mc_configuration *mcconf = mempools_alloc_mcconf();
 	*mcconf = *mc_interface_get_configuration();
 
-	float current = current_;
-	float min_rpm = min_rpm_;
-	float duty = duty_;
 	float resistance = mcconf->foc_motor_r;
-	float inductance = 0.0;
+	float inductance = mcconf->foc_motor_l;
 
 	float linkage, linkage_undriven, undriven_samples;
-	bool res = conf_general_measure_flux_linkage_openloop(current, duty, min_rpm, resistance, inductance,
+	bool res = conf_general_measure_flux_linkage_openloop(current_, duty_, min_rpm_, resistance, inductance,
 			&linkage, &linkage_undriven, &undriven_samples);
 
 	if (undriven_samples > 60) {
@@ -126,6 +123,9 @@ void earthsense_detect_and_apply_hall_sensors(float current_)
 	*mcconf = *mc_interface_get_configuration();
 
 	if (mcconf->m_sensor_port_mode == SENSOR_PORT_MODE_HALL) {
+		mc_configuration *mcconf_old = mempools_alloc_mcconf();
+		*mcconf_old = *mcconf;
+
 		// Initialize Hall Sensor Test Parameters
 		mcconf->motor_type = MOTOR_TYPE_FOC;
 		mcconf->foc_f_zv = 10000.0;
@@ -142,15 +142,16 @@ void earthsense_detect_and_apply_hall_sensors(float current_)
 			int hall_table_length = 8;
 			for (int i = 0; i < hall_table_length; i++) {
 				commands_printf("Hall Table #%d: %d", i, hall_tab[i]);				
-				mcconf->hall_table[i] = (int8_t)hall_tab[i];
+				mcconf_old->foc_hall_table[i] = hall_tab[i];
 			}
-			mc_interface_set_configuration(mcconf);
+			mc_interface_set_configuration(mcconf_old);
 		}
 		else
 		{
 			commands_printf("Flux Linkage Tuning Failed!");
 		}
 
+		mempools_free_mcconf(mcconf_old);
 	} else {
 		commands_printf("Hall Sensor Tuning Unavailable!");
 	}
@@ -158,14 +159,14 @@ void earthsense_detect_and_apply_hall_sensors(float current_)
 	mempools_free_mcconf(mcconf);
 }
 
-void earthsense_detect_and_apply_foc_all(float current_, float min_rpm_, float duty_)
+void earthsense_detect_and_apply_foc_all(float current_, float min_rpm_, float duty_, float hall_current_)
 {
 	// Run RL Tuning 
 	earthsense_detect_and_apply_r_l();
 	// Run Linakge Tuning
 	earthsense_detect_and_apply_foc_linkage(current_, min_rpm_, duty_);
 	// Run Hall Sensors Tuning
-	earthsense_detect_and_apply_hall_sensors(current_);
+	earthsense_detect_and_apply_hall_sensors(hall_current_);
 }
 
 void earthsense_set_current_kp(float current_kp_)
@@ -1768,10 +1769,10 @@ void terminal_process_string(char *str)
 		commands_printf("  Fowards command to all VESCs.");
 
 		// Automatic Tuning
-		commands_printf("earthsense_detect_and_apply_foc_all [current] [min_rpm] [duty]");
+		commands_printf("earthsense_detect_and_apply_foc_all [current] [min_rpm] [duty] [hall_current]");
 		commands_printf("  Measure and apply all tuning requirements for EarthSense VESCs.");
 
-		commands_printf("earthsense_detect_and_apply_foc_all_can [current] [min_rpm] [duty]");
+		commands_printf("earthsense_detect_and_apply_foc_all_can [current] [min_rpm] [duty] [hall_current]");
 		commands_printf("  Measure and apply all tuning requirements for EarthSense VESCs.");
 		commands_printf("  Fowards command to all VESCs.");
 
@@ -1898,27 +1899,30 @@ void terminal_process_string(char *str)
 	else if (strcmp(argv[0], "earthsense_detect_and_apply_foc_all") == 0)
 	{
 		// Get Input from Terminal
-		float current = -1, min_rpm = -1, duty = -1;
+		float current = -1, min_rpm = -1, duty = -1, hall_current = -1;
 		sscanf(argv[1], "%f", &current);
 		sscanf(argv[2], "%f", &min_rpm);
 		sscanf(argv[3], "%f", &duty);
-		earthsense_detect_and_apply_foc_all(current, min_rpm, duty);
+		sscanf(argv[4], "%f", &hall_current);
+		earthsense_detect_and_apply_foc_all(current, min_rpm, duty, hall_current);
 	}
 	else if (strcmp(argv[0], "earthsense_detect_and_apply_foc_all_can") == 0)
 	{
 		// Get Input from Terminal
-		float current = -1, min_rpm = -1, duty = -1;
+		float current = -1, min_rpm = -1, duty = -1, hall_current = -1;
 		sscanf(argv[1], "%f", &current);
 		sscanf(argv[2], "%f", &min_rpm);
 		sscanf(argv[3], "%f", &duty);
+		sscanf(argv[4], "%f", &hall_current);
 
-		// Send CAN Packet as Broadcast (ID = 255) [ID, CURRENT, MIN_RPM, DUTY]
-		int length = 4;
+		// Send CAN Packet as Broadcast (ID = 255) [ID, CURRENT, MIN_RPM, DUTY, HALL_CURRENT]
+		int length = 5;
 		uint8_t buffer[length];
 		buffer[0] = app_get_configuration()->controller_id;
 		buffer[1] = current;
 		buffer[2] = min_rpm;
 		buffer[3] = duty;
+		buffer[4] = hall_current;
 		comm_can_transmit_eid_replace(255 | ((uint32_t)CAN_PACKET_ES_DETECT_APPLY_ALL_FOC_TUNING << 8), buffer, length, true);
 	}
 	else if (strcmp(argv[0], "earthsense_set_current_kp") == 0)

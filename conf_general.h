@@ -214,13 +214,13 @@
 // Defining QMLUI_HW_FULLSCREEN and/or QMLUI_APP_FULLSCREEN will disable the other pages in the
 // mobile version of VESC Tool.
 //
-//#define QMLUI_SOURCE_HW		"qmlui/hw/qmlui_example_hw.c"
-//#define QMLUI_HEADER_HW		"qmlui/hw/qmlui_example_hw.h"
-//#define QMLUI_HW_FULLSCREEN
-//
-//#define QMLUI_SOURCE_APP	"qmlui/app/qmlui_example_app.c"
-//#define QMLUI_HEADER_APP	"qmlui/app/qmlui_example_app.h"
-//#define QMLUI_APP_FULLSCREEN
+#define QMLUI_SOURCE_HW		"qmlui/hw/es_qmlui_hw.c"
+#define QMLUI_HEADER_HW		"qmlui/hw/es_qmlui_hw.h"
+#define QMLUI_HW_FULLSCREEN
+
+#define QMLUI_SOURCE_APP	"qmlui/app/es_qmlui_app.c"
+#define QMLUI_HEADER_APP	"qmlui/app/es_qmlui_app.h"
+#define QMLUI_APP_FULLSCREEN
 
 /*
  * Select default user motor configuration

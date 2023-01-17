@@ -1601,12 +1601,13 @@ static void decode_msg(uint32_t eid, uint8_t *data8, int len, bool is_replaced) 
 			} break;
 
 			case CAN_PACKET_ES_DETECT_APPLY_ALL_FOC_TUNING: {
-				// Process CAN Packet: [ID, CURRENT, MIN_RPM, DUTY]
+				// Process CAN Packet: [ID, CURRENT, MIN_RPM, DUTY, HALL_CURRENT]
 				// Current, Min_rpm, Duty in 2nd, 3rd, 4th bytes respectively
 				float current = data8[1];
 				float min_rpm = data8[2];
 				float duty = data8[3];
-				earthsense_detect_and_apply_foc_all(current, min_rpm, duty);
+				float hall_current = data8[4];
+				earthsense_detect_and_apply_foc_all(current, min_rpm, duty, hall_current);
 			} break;
 
 			case CAN_PACKET_ES_SET_CURRENT_KP: {
