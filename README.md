@@ -1,5 +1,18 @@
 # VESC firmware
 
+EarthSense VESC Firmware QuickStart:\
+1.) Download ChibiStudio from https://www.chibios.org/dokuwiki/doku.php?id=chibios:products:chibistudio:start\
+2.) Clone the repository and open it in ChibiStudio\
+3.) Build the project
+
+VESC Debugging:\
+1.) Navigate to ChibiStudio\
+2.) OpenOCD on STLink using "stm32-bv_openocd"\
+3.) Run the "(build-BLDC_$_ChibiOS.elf)(OpenOCD, Just Run)" Debug Task
+
+
+----------------------------------------------------------------------------------
+
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Travis CI Status](https://travis-ci.com/vedderb/bldc.svg?branch=master)](https://travis-ci.com/vedderb/bldc)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/75e90ffbd46841a3a7be2a9f7a94c242)](https://www.codacy.com/app/vedderb/bldc?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=vedderb/bldc&amp;utm_campaign=Badge_Grade)
